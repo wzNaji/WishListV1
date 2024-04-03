@@ -35,12 +35,12 @@ public class ItemController {
 
     @GetMapping("/delete/{id}")
     public String deleteItem(@PathVariable int id) {
-       Optional<Item> item = itemService.findById(id);
-        if (item.isPresent()) {
-            itemService.deleteItem(item);
-            return "redirect:/";
+        if (itemService.findById(id).isPresent()) {
+            itemService.deleteById(id);
+            return "redirect:/"; // Item found and deleted, redirect to home
+        } else {
+            return "redirect:/errorPage"; // Item not found, redirect to error page
         }
-
-        return "redirect:/errorPage";
     }
+
 }

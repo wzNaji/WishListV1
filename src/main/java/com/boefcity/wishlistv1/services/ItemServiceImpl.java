@@ -27,9 +27,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public void deleteItem(Optional<Item> item) {
-        Optional<Item> itemToDelete = findById(item.getId());
-    itemRepository.delete(item);
+    public void deleteById(int id) {
+        itemRepository.deleteById(id);
     }
 
 

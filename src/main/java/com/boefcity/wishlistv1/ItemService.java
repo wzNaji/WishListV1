@@ -8,5 +8,5 @@ public interface ItemService {
     Item create (Item item);
     Optional<Item> findById (int id);
 
-    void deleteItem(Optional<Item> item);
+    void deleteById(int id);
 }
