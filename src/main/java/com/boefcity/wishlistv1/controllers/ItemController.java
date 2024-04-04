@@ -23,7 +23,7 @@ public class ItemController {
     }
 
     @PostMapping("/create")
-    public String saveAttraction(@ModelAttribute Item item) {
+    public String saveItem(@ModelAttribute Item item) {
         if (item.getName().isEmpty()) {
             return "redirect:/errorPage";
         }
@@ -42,5 +42,27 @@ public class ItemController {
             return "redirect:/errorPage"; // Item not found, redirect to error page
         }
     }
+
+    @GetMapping("/home")
+    public String displayItems(Model model) {
+        model.addAttribute("items", itemService.findAll());
+        return "home";
+    }
+
+    @GetMapping("/edit/{id}")
+    public String editForm(@PathVariable int id, Model model) {
+        Optional<Item> item = itemService.findById(id);
+        if (item.isPresent()) {
+            model.addAttribute("itemDetails", item.get());
+        }
+        else {
+            return "errorPage";
+        }
+        return "editForm";
+    }
+
+
+
+
 
 }
