@@ -13,5 +13,5 @@ public interface ItemService {
 
     List<Item> findAll();
 
-    void update(int id);
+    Item update(int id);
 }

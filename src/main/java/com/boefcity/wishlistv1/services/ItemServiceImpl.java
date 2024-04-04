@@ -39,8 +39,14 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findAll();
     }
 
+    @Override
+    public Item update(int id) {
+        return null;
+    }
+// FIND UD AF HVA DER FOREGÅR HER
+
     @Transactional
-    public Item updateItem(int id, Item itemDetails) {
+    public Item update(int id, Item itemDetails) {
         Item itemToUpdate = itemRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Item not found for this id :: " + id));
 
@@ -51,5 +57,6 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.save(itemToUpdate);
     }
 
-
 }
+
+
