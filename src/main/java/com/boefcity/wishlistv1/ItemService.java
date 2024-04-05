@@ -1,6 +1,7 @@
 package com.boefcity.wishlistv1;
 
 import com.boefcity.wishlistv1.entity.Item;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,5 +14,5 @@ public interface ItemService {
 
     List<Item> findAll();
 
-    Item update(int id);
+    Item update(int id, Item itemDetails);
 }

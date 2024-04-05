@@ -30,23 +30,23 @@ public class ItemController {
         Item itemToCreate = new Item(item.getId(),
                 item.getName(), item.getDescription(), item.getLink());
         itemService.create(itemToCreate);
-        return "redirect:/";
+        return "redirect:/items";
     }
 
     @GetMapping("/delete/{id}")
     public String deleteItem(@PathVariable int id) {
         if (itemService.findById(id).isPresent()) {
             itemService.deleteById(id);
-            return "redirect:/"; // Item found and deleted, redirect to home
+            return "redirect:/items"; // Item found and deleted, redirect to items
         } else {
             return "redirect:/errorPage"; // Item not found, redirect to error page
         }
     }
 
-    @GetMapping("/home")
+    @GetMapping("/items")
     public String displayItems(Model model) {
         model.addAttribute("items", itemService.findAll());
-        return "home";
+        return "items";
     }
 
     @GetMapping("/edit/{id}")
@@ -61,8 +61,25 @@ public class ItemController {
         return "editForm";
     }
 
+    @PostMapping("/update/{id}")
+    public String updateItem(@PathVariable int id, @ModelAttribute("itemDetails") Item itemDetails) {
+        itemService.update(id, itemDetails);
+        return "redirect:/items";
+    }
 
+    /*
+    @GetMapping("/view/{id}")
+    public String viewItem(@PathVariable int id, Model model) {
+        Optional<Item> item = itemService.findById(id);
+        if (item.isPresent()) {
+            model.addAttribute("item", item.get());
+            return "viewItem";
+        } else {
+            return "redirect:/errorPage";
+        }
+    }
 
+     */
 
 
 }

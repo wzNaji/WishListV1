@@ -3,6 +3,7 @@ package com.boefcity.wishlistv1.services;
 import com.boefcity.wishlistv1.ItemService;
 import com.boefcity.wishlistv1.entity.Item;
 import com.boefcity.wishlistv1.repository.ItemRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ public class ItemServiceImpl implements ItemService {
         itemRepository.save(item);
     }
 
+    @Transactional(readOnly = true) // Når vi kun skal læse fra databasen. Optimerer resource usage og perfomance.
     @Override
     public Optional<Item> findById(int id) {
         return itemRepository.findById(id);
@@ -34,21 +36,18 @@ public class ItemServiceImpl implements ItemService {
         itemRepository.deleteById(id);
     }
 
+    @Transactional(readOnly = true) // Når vi kun skal læse fra databasen. Optimerer resource usage og perfomance.
     @Override
     public List<Item> findAll() {
         return itemRepository.findAll();
     }
 
-    @Override
-    public Item update(int id) {
-        return null;
-    }
-// FIND UD AF HVA DER FOREGÅR HER
 
     @Transactional
+    @Override
     public Item update(int id, Item itemDetails) {
         Item itemToUpdate = itemRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Item not found for this id :: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Item not found for this id :: " + id));
 
         itemToUpdate.setName(itemDetails.getName());
         itemToUpdate.setDescription(itemDetails.getDescription());
