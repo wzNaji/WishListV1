@@ -2,16 +2,19 @@ package com.boefcity.wishlistv1.controllers;
 
 import com.boefcity.wishlistv1.ItemService;
 import com.boefcity.wishlistv1.entity.Item;
+import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockHttpSession;
+import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -31,7 +34,9 @@ class ItemControllerTest {
     @InjectMocks
     private ItemController itemController;
 
-    private Item item; // Declare an item object to be used across different tests
+    private Item item;
+
+    private final MockHttpSession session = new MockHttpSession();
 
     // Setup method to initialize test data before each test execution
     @BeforeEach
@@ -58,98 +63,117 @@ class ItemControllerTest {
     // Test for saving a valid item, expecting redirection to the items list
     @Test
     void saveItem_RedirectsToItems() {
+        // Mock HttpSession
+        HttpSession session = mock(HttpSession.class);
+        List<Item> wishlist = new ArrayList<>();
+        when(session.getAttribute("wishlist")).thenReturn(wishlist);
+
         // Execute the save item operation
-        String redirectView = itemController.saveItem(item);
+        Item item = new Item();
+        item.setName("Test Item");
+        String redirectView = itemController.saveItem(item, session);
+
         // Assert the expected redirection view name
         assertEquals("redirect:/items", redirectView);
-        // Verify that the item service's create method was called exactly once
-        verify(itemService, times(1)).create(any(Item.class));
+
+        // Verify the wishlist in the session is updated
+        assertEquals(1, wishlist.size()); // Ensure the wishlist now contains the item
+        verify(session, times(1)).setAttribute(eq("wishlist"), any());
     }
+
 
     // Test for attempting to save an invalid item (empty name), expecting redirection to an error page
     @Test
     void saveItem_RedirectsToErrorPage_WhenNameIsEmpty() {
-        item.setName(""); // Make the item invalid
+        // Mock HttpSession
+        HttpSession session = mock(HttpSession.class);
+
+        // Prepare the item with an empty name
+        Item item = new Item();
+        item.setName("");
+
         // Perform the operation
-        String redirectView = itemController.saveItem(item);
+        String redirectView = itemController.saveItem(item, session);
+
         // Assert redirection to the error page
         assertEquals("redirect:/errorPage", redirectView);
-        // Verify the item service's create method was never called due to validation failure
-        verify(itemService, never()).create(any(Item.class));
+
+        // Since the operation should fail before interacting with the session,
+        // no interactions with the session to set the attribute are expected
+        verify(session, never()).setAttribute(eq("wishlist"), any());
     }
 
-    // Test deleting an existing item, expecting redirection to the items list
+
     @Test
-    void deleteItem_RedirectsToHome_WhenItemExists() {
-        // Mock itemService to return an item for given id
-        when(itemService.findById(anyInt())).thenReturn(Optional.of(item));
-        // Execute delete operation
-        String redirectView = itemController.deleteItem(1);
-        // Assert redirection to items list
+    void saveItem_RedirectsToItems_WhenValid() {
+        // Given an item with a non-empty name
+        String redirectView = itemController.saveItem(item, session);
+
+        // Expect redirection to the items list
         assertEquals("redirect:/items", redirectView);
-        // Verify deletion method called once
-        verify(itemService, times(1)).deleteById(1);
+
+        // And the session contains the wishlist with the item
+        @SuppressWarnings("unchecked")
+        List<Item> wishlist = (List<Item>) session.getAttribute("wishlist");
+        assertEquals(1, wishlist.size());
+        assertEquals(item.getName(), wishlist.get(0).getName());
     }
 
-    // Test deleting a non-existing item, expecting redirection to an error page
     @Test
-    void deleteItem_RedirectsToErrorPage_WhenItemDoesNotExist() {
-        // Mock itemService to return empty for given id, simulating not found
-        when(itemService.findById(anyInt())).thenReturn(Optional.empty());
-        // Perform the delete operation
-        String redirectView = itemController.deleteItem(1);
-        // Assert redirection to error page
-        assertEquals("redirect:/errorPage", redirectView);
-        // Verify delete method was never called due to item not existing
-        verify(itemService, never()).deleteById(1);
+    void deleteItem_RedirectsToItems_WhenItemExists() {
+        // Given a wishlist with one item
+        List<Item> wishlist = new ArrayList<>();
+        wishlist.add(item);
+        session.setAttribute("wishlist", wishlist);
+
+        // When deleting an existing item
+        String redirectView = itemController.deleteItem(item.getId(), session);
+
+        // Expect redirection to the items list
+        assertEquals("redirect:/items", redirectView);
+
+        // And the session wishlist is empty
+        wishlist = (List<Item>) session.getAttribute("wishlist");
+        assertTrue(wishlist.isEmpty());
     }
 
-    // Test displaying items, expecting the items view to be returned
     @Test
-    void displayItems() {
-        // Mock itemService to return a list containing the test item
-        when(itemService.findAll()).thenReturn(Arrays.asList(item));
-        // Call the method under test
-        String viewName = itemController.displayItems(model);
-        // Assert that the correct view is returned
+    void displayItems_ShowsItemsInView() {
+        // Given a wishlist in the session
+        List<Item> wishlist = new ArrayList<>();
+        wishlist.add(item);
+        session.setAttribute("wishlist", wishlist);
+
+        Model model = new ExtendedModelMap();
+
+        // When displaying items
+        String viewName = itemController.displayItems(session, model);
+
+        // Expect the items view is returned
         assertEquals("items", viewName);
-        // Verify model had 'items' attribute added exactly once
-        verify(model, times(1)).addAttribute(eq("items"), anyList());
+
+        // And the model contains the wishlist from the session
+        assertEquals(wishlist, model.getAttribute("items"));
     }
 
-    // Test editing an existing item, expecting the edit form view
     @Test
-    void editForm_RedirectsToEditForm_WhenItemExists() {
-        // Mock findById to simulate existing item
-        when(itemService.findById(anyInt())).thenReturn(Optional.of(item));
-        // Execute the edit form request
-        String viewName = itemController.editForm(1, model);
-        // Assert the expected view name is returned
-        assertEquals("editForm", viewName);
-        // Verify model had 'itemDetails' attribute added once
-        verify(model, times(1)).addAttribute(eq("itemDetails"), any(Item.class));
-    }
+    void saveWishlist_SavesItemsToDatabase() {
+        // Given a wishlist in the session
+        List<Item> wishlist = new ArrayList<>();
+        wishlist.add(item);
+        session.setAttribute("wishlist", wishlist);
 
-    // Test editing a non-existing item, expecting redirection to the error page
-    @Test
-    void editForm_RedirectsToErrorPage_WhenItemDoesNotExist() {
-        // Mock findById to return empty, simulating item not found
-        when(itemService.findById(anyInt())).thenReturn(Optional.empty());
-        // Attempt to edit a non-existing item
-        String viewName = itemController.editForm(1, model);
-        // Assert redirection to error page
-        assertEquals("errorPage", viewName);
-    }
+        // When saving the wishlist to the database
+        String redirectView = itemController.saveWishlist(session);
 
-    // Test updating an item, expecting redirection to the items list
-    @Test
-    void updateItem_RedirectsToItems() {
-        // Execute the update operation
-        String redirectView = itemController.updateItem(1, item);
-        // Assert the expected redirection
+        // Expect redirection to the items list
         assertEquals("redirect:/items", redirectView);
-        // Verify the update method was called once with specific id and item
-        verify(itemService, times(1)).update(eq(1), any(Item.class));
+
+        // And the wishlist is saved using itemService
+        verify(itemService, times(1)).create(any(Item.class));
+
+        // And the session wishlist is cleared
+        assertNull(session.getAttribute("wishlist"));
     }
 
     /*
