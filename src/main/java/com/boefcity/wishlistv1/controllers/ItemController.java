@@ -19,6 +19,10 @@ public class ItemController {
     public ItemController(ItemService itemService) {
         this.itemService = itemService;
     }
+    @GetMapping("/")
+    public String displayHomePage() {
+        return "homePage";
+    }
 
     @GetMapping("/addForm")
     public String displayAddForm(Model model) {

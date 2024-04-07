@@ -2,9 +2,50 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/homePage.css" rel="stylesheet">
+    <title>Wishlist</title>
+    <style>
+        /* Existing styles */
+        .image-wrapper {
+            position: relative;
+            display: inline-block; /* Makes the wrapper fit the content */
+        }
+        .image-wrapper .btn-overlay {
+            position: absolute;
+            top: 50%; /* Center vertically */
+            left: 50%; /* Center horizontally */
+            transform: translate(-50%, -50%); /* Adjust to precisely center */
+            padding: 0.25rem 0.5rem; /* Smaller padding */
+            font-size: 0.75rem; /* Smaller text */
+        }
+    </style>
+
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
+
+<header>
+    <nav class="navbar navbar-light bg-light d-flex justify-content-center">
+        <h1>Welcome To Your Own Wishlist</h1>
+    </nav>
+</header>
+
+<main class="container my-auto text-center">
+    <div class="d-flex flex-column align-items-center justify-content-center">
+        <!-- Wrapper div for image and button -->
+        <div class="image-wrapper">
+            <img src="/images/wishlist.png" alt="Wishlist" class="img-fluid">
+            <!-- Apply the btn-overlay class for positioning -->
+            <button type="button" class="btn btn-primary mt-3 btn-overlay">Click Me</button>
+        </div>
+    </div>
+</main>
+
+<footer class= "mt-auto text-center bg-light">
+    <p>Contact</p>
+    <p>BoefCity@EMC.com</p>
+</footer>
 
 </body>
 </html>
