@@ -1,9 +1,10 @@
 body {
-    background-color: orange;
+    background: linear-gradient(to bottom, brown, darkorange);
+
 }
 header {
-    background: darkorange;
+    background: linear-gradient(to bottom, darkorange, brown);
 }
 footer {
-    background-color: darkorange;
+    background: linear-gradient(to bottom, darkorange, brown);
 }

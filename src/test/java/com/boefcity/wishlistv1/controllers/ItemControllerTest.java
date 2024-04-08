@@ -12,6 +12,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -156,15 +158,22 @@ class ItemControllerTest {
         assertEquals(wishlist, model.getAttribute("items"));
     }
 
+
+
+// Your existing test class code...
+
     @Test
-    void saveWishlist_SavesItemsToDatabase() {
+    void saveWishlist_SavesItemsToDatabaseAndRedirects() {
         // Given a wishlist in the session
         List<Item> wishlist = new ArrayList<>();
         wishlist.add(item);
         session.setAttribute("wishlist", wishlist);
 
+        // Mock RedirectAttributes
+        RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
         // When saving the wishlist to the database
-        String redirectView = itemController.saveWishlist(session);
+        String redirectView = itemController.saveWishlist(session, redirectAttributes);
 
         // Expect redirection to the items list
         assertEquals("redirect:/items", redirectView);
@@ -174,7 +183,11 @@ class ItemControllerTest {
 
         // And the session wishlist is cleared
         assertNull(session.getAttribute("wishlist"));
+
+        // Optionally verify that the success message was added to redirect attributes
+        assertNotNull(redirectAttributes.getFlashAttributes().get("successMessage"));
     }
+
 
     /*
     Uncomment and complete these tests if implementing viewing a single item feature

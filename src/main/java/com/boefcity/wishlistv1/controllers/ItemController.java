@@ -6,6 +6,8 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +34,7 @@ public class ItemController {
 
     @PostMapping("/create")
     public String saveItem(@ModelAttribute Item item, HttpSession session) {
+        System.out.println("hit hit");
         // Checks if the item's name is empty and redirects to an error page if true.
         if (item.getName().isEmpty()) {
             return "redirect:/errorPage";
@@ -89,8 +92,8 @@ public class ItemController {
     }
 
     // Saves the current wishlist to the database and clears it from the session.
-    @GetMapping("/saveWishlist")
-    public String saveWishlist(HttpSession session) {
+    @PostMapping("/saveWishlist")
+    public String saveWishlist(HttpSession session, RedirectAttributes redirectAttributes) {
         // Retrieves the wishlist from the session.
         List<Item> wishlist = getWishlist(session);
         // Iterates over the wishlist and saves each item using the itemService.
@@ -99,6 +102,10 @@ public class ItemController {
         }
         // Clears the wishlist from the session.
         session.removeAttribute("wishlist");
+
+        // Add a flash attribute with the success message
+        redirectAttributes.addFlashAttribute("successMessage", "List has been saved");
+
         return "redirect:/items";
     }
 
