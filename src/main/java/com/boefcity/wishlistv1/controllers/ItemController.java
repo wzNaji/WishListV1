@@ -32,10 +32,34 @@ public class ItemController {
 
     @GetMapping("/login")
     public String displayLoginForm() {
-        return "loginForm"; // Assume you have a login form at "src/main/resources/templates/loginForm.html"
+        return "loginForm";
+    }
+    @GetMapping("/register")
+    public String displayRegisterForm(Model model) {
+        model.addAttribute("user", new User());
+        return "registerForm"; // Name of the HTML file for the registration form
     }
 
-    @PostMapping("/login")
+    @PostMapping("/register")
+    public String createUser(@ModelAttribute User user, RedirectAttributes redirectAttributes) {
+        try {
+            User existingUser = userService.findByUserName(user.getUserName());
+            if (existingUser != null) {
+                redirectAttributes.addFlashAttribute("message", "Username already exists.");
+                return "redirect:/register";
+            }
+
+            userService.saveUser(user);
+            redirectAttributes.addFlashAttribute("message", "User registered successfully!");
+            return "redirect:/login";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("message", "An error occurred.");
+            return "redirect:/register";
+        }
+    }
+
+
+    @PostMapping("/loginUser")
     public String loginUser(@RequestParam String userName, @RequestParam String password, HttpSession session) {
         boolean isValidUser = userService.checkLogin(userName, password);
         if (isValidUser) {
