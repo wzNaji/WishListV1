@@ -12,7 +12,7 @@
         </nav>
     </header>
     <main>
-        <form action="@{/create}" th:method="post" th:object="${item}">
+        <form th:action="@{/create}" th:method="post" th:object="${item}">
             <div class="m-5">
                 <label for="name" class="form-label">Name</label>
                 <input type="text" th:field="*{name}" id="name" class="form-control">

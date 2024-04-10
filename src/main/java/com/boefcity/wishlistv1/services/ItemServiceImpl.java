@@ -55,6 +55,10 @@ public class ItemServiceImpl implements ItemService {
 
         return itemRepository.save(itemToUpdate);
     }
+    @Override
+    public List<Item> findByUserUserId(int userId) {
+        return itemRepository.findByUserUserId(userId);
+    }
 
 }
 

@@ -9,19 +9,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name="items")
-
-
-public class Item {
+@Table(name="users")
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    private String name;
-    private String description;
-    private String link;
+    private int userId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(nullable = false, unique = true)
+    private String userName;
 
+    @Column(nullable = false)
+    private String userPassword;
+
+    private String userSession;
 }

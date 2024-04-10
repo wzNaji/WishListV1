@@ -15,4 +15,5 @@ public interface ItemService {
     List<Item> findAll();
 
     Item update(int id, Item itemDetails);
+    List<Item> findByUserUserId(int userId);
 }

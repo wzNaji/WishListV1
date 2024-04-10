@@ -1,120 +1,90 @@
 package com.boefcity.wishlistv1.controllers;
 
 import com.boefcity.wishlistv1.ItemService;
+import com.boefcity.wishlistv1.UserService;
 import com.boefcity.wishlistv1.entity.Item;
+import com.boefcity.wishlistv1.entity.User;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 public class ItemController {
 
     private final ItemService itemService;
+    private final UserService userService;
 
-    public ItemController(ItemService itemService) {
+    @Autowired
+    public ItemController(ItemService itemService, UserService userService) {
         this.itemService = itemService;
+        this.userService = userService;
     }
+
     @GetMapping("/")
     public String displayHomePage() {
         return "homePage";
     }
 
+    @GetMapping("/login")
+    public String displayLoginForm() {
+        return "loginForm"; // Assume you have a login form at "src/main/resources/templates/loginForm.html"
+    }
+
+    @PostMapping("/login")
+    public String loginUser(@RequestParam String userName, @RequestParam String password, HttpSession session) {
+        boolean isValidUser = userService.checkLogin(userName, password);
+        if (isValidUser) {
+            User user = userService.findByUserName(userName);
+            session.setAttribute("userId", user.getUserId());
+            return "redirect:/items";
+        } else {
+            return "loginError"; // Assume you have a login error page at "src/main/resources/templates/loginError.html"
+        }
+    }
+
     @GetMapping("/addForm")
     public String displayAddForm(Model model) {
-        // Adds a new, empty Item object to the model so the form can bind to it.
         model.addAttribute("item", new Item());
         return "addForm";
     }
 
     @PostMapping("/create")
-    public String saveItem(@ModelAttribute Item item, HttpSession session) {
-        System.out.println("hit hit");
-        // Checks if the item's name is empty and redirects to an error page if true.
-        if (item.getName().isEmpty()) {
-            return "redirect:/errorPage";
+    public String createItem(@ModelAttribute Item item, HttpSession session, RedirectAttributes redirectAttributes) {
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/login";
         }
-        // Retrieves the current wishlist from the session, creating a new one if it doesn't exist.
-        List<Item> wishlist = getWishlist(session);
-        // Adds the new item to the wishlist.
-        wishlist.add(item);
-        // Updates the session with the new wishlist.
-        session.setAttribute("wishlist", wishlist);
+        User user = userService.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        item.setUser(user);
+        itemService.create(item);
+        redirectAttributes.addFlashAttribute("message", "Item added successfully!");
         return "redirect:/items";
     }
 
-    // Handles the deletion of an item from the wishlist.
-    @GetMapping("/delete/{id}")
-    public String deleteItem(@PathVariable int id, HttpSession session) {
-        // Retrieves the wishlist from the session.
-        List<Item> wishlist = getWishlist(session);
-        // Removes the item with the given id from the wishlist.
-        wishlist.removeIf(item -> item.getId() == id);
-        // Updates the session with the modified wishlist.
-        session.setAttribute("wishlist", wishlist);
-        return "redirect:/items";
-    }
-
-    // Displays all items in the wishlist.
     @GetMapping("/items")
     public String displayItems(HttpSession session, Model model) {
-        List<Item> wishlist = getWishlist(session);
-        // Adds the wishlist to the model to be displayed in the view.
-        model.addAttribute("items", wishlist);
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/login";
+        }
+        List<Item> wishlist = itemService.findByUserUserId(userId);
+        model.addAttribute("wishlist", wishlist);
         return "items";
     }
 
-    // Displays the form for editing an existing item.
-    @GetMapping("/edit/{id}")
-    public String editForm(@PathVariable int id, Model model, HttpSession session) {
-        List<Item> wishlist = getWishlist(session);
-        Optional<Item> itemToEdit = wishlist.stream().filter(item -> item.getId() == id).findFirst();
-        // If the item is found, adds it to the model; otherwise, redirects to an error page.
-        itemToEdit.ifPresent(item -> model.addAttribute("itemDetails", item));
-        return itemToEdit.isPresent() ? "editForm" : "redirect:/errorPage";
-    }
+    // The rest of your methods (delete, update, etc.) should similarly ensure user is logged in and operate on that user's items
 
-    // Processes the form submission for updating an item.
-    @PostMapping("/update/{id}")
-    public String updateItem(@PathVariable int id, @ModelAttribute("itemDetails") Item itemDetails, HttpSession session) {
-        // Retrieves the wishlist and replaces the item with updated details.
-        List<Item> wishlist = getWishlist(session);
-        wishlist.replaceAll(item -> item.getId() == id ? itemDetails : item);
-        // Updates the session with the modified wishlist.
-        session.setAttribute("wishlist", wishlist);
-        // Redirects to the "/items" page.
-        return "redirect:/items";
-    }
-
-    // Saves the current wishlist to the database and clears it from the session.
-    @PostMapping("/saveWishlist")
-    public String saveWishlist(HttpSession session, RedirectAttributes redirectAttributes) {
-        // Retrieves the wishlist from the session.
-        List<Item> wishlist = getWishlist(session);
-        // Iterates over the wishlist and saves each item using the itemService.
-        for (Item item : wishlist) {
-            itemService.create(new Item(item.getId(), item.getName(), item.getDescription(), item.getLink()));
-        }
-        // Clears the wishlist from the session.
-        session.removeAttribute("wishlist");
-
-        // Add a flash attribute with the success message
-        redirectAttributes.addFlashAttribute("successMessage", "List has been saved");
-
-        return "redirect:/items";
-    }
-
-    // Utility method to safely retrieve or create the wishlist from the session.
+    // Utility method for session-based wishlist retrieval, adjusted for direct database fetching
     private List<Item> getWishlist(HttpSession session) {
-        List<Item> wishlist = (List<Item>) session.getAttribute("wishlist");
-        if (wishlist == null) {
-            wishlist = new ArrayList<>();
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId != null) {
+            return itemService.findByUserUserId(userId);
         }
-        return wishlist;
+        return List.of(); // Return an empty list if no user is logged in
     }
 }
