@@ -13,13 +13,26 @@
     </nav>
 </header>
 
-<main>
-    <form action="#" th:action="@{/register}" th:object="${user}" method="post">
-        <input type="text" th:field="*{userName}" placeholder="Username"/>
-        <input type="password" th:field="*{userPassword}" placeholder="Password"/>
-        <button type="submit">Register</button>
-    </form>
-
+<main class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div th:if="${message}" class="alert alert-dismissible fade show" role="alert">
+                <span th:text="${message}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <form action="#" th:action="@{/register}" th:object="${user}" method="post" class="p-4 border rounded-3">
+                <div class="mb-3">
+                    <label for="userName" class="form-label">Username</label>
+                    <input type="text" th:field="*{userName}" class="form-control" id="userName" placeholder="Username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="userPassword" class="form-label">Password</label>
+                    <input type="password" th:field="*{userPassword}" class="form-control" id="userPassword" placeholder="Password" required>
+                </div>
+                <button type="submit" class="btn btn-outline-secondary">Register</button>
+            </form>
+        </div>
+    </div>
 </main>
 
 </body>

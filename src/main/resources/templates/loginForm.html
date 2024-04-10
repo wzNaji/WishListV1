@@ -13,21 +13,25 @@
     </nav>
   </header>
 
-  <main>
-      <form th:action="@{/loginUser}" th:method="post">
-          <div>
-              <label for="userName">Username</label>
-              <input type="text" id="userName" name="userName" required />
+  <main class="container">
+      <div class="row justify-content-center">
+          <div class="col-md-6">
+              <form th:action="@{/loginUser}" method="post" class="p-4 border rounded-3">
+                  <div class="mb-3">
+                      <label for="userName" class="form-label">Username</label>
+                      <input type="text" class="form-control" id="userName" name="userName" required />
+                  </div>
+                  <div class="mb-3">
+                      <label for="password" class="form-label">Password</label>
+                      <input type="password" class="form-control" id="password" name="password" required />
+                  </div>
+                  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                      <button type="submit" class="btn btn-outline-secondary">Login</button>
+                      <a href="/homePage" class="btn btn-outline-secondary">Cancel</a>
+                  </div>
+              </form>
           </div>
-          <div>
-              <label for="password">Password</label>
-              <input type="password" id="password" name="password" required />
-          </div>
-          <div>
-              <button type="submit">Login</button>
-              <a href="/homePage" class="btn btn-primary">Cancel</a>
-          </div>
-      </form>
+      </div>
   </main>
 
 </body>

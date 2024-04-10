@@ -13,10 +13,6 @@
         </nav>
     </header>
     <main>
-        <!-- Success message display -->
-        <div th:if="${successMessage}" class="alert alert-success" role="alert">
-            <p th:text="${successMessage}"></p>
-        </div>
         <table class="table table-hover">
             <thead>
             <tr>
@@ -35,7 +31,8 @@
             </tr>
             </tbody>
         </table>
-        <a href="/addForm"><button type="button" class="btn btn-danger ms-3">ADD</button></a>
+        <a href="/addForm"><button type="button" class="btn btn-success ms-3">ADD</button></a>
+        <a href="/"><button type="button" class="btn btn-primary ms-3">Exit</button></a>
 
     </main>
     <footer class="mt-auto text-center">

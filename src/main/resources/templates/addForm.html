@@ -13,15 +13,15 @@
     </header>
     <main>
         <form th:action="@{/create}" th:method="post" th:object="${item}">
-            <div class="m-5">
+            <div class="m-3">
                 <label for="name" class="form-label">Name</label>
                 <input type="text" th:field="*{name}" id="name" class="form-control">
             </div>
-            <div class="mb-3">
+            <div class="m-3">
                 <label for="description" class="form-label">Description</label>
                 <textarea th:field="*{description}" id="description" class="form-control"></textarea>
             </div>
-            <div class="mb-3">
+            <div class="m-3">
                 <label for="link" class="form-label">Link</label>
                 <input type="text" th:field="*{link}" id="link" class="form-control">
             </div>
