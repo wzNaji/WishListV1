@@ -121,6 +121,7 @@ public class ItemController {
         return "redirect:/items";
     }
 
+
     // Utility method for session-based wishlist retrieval, adjusted for direct database fetching
     private List<Item> getWishlist(HttpSession session) {
         Integer userId = (Integer) session.getAttribute("userId");
