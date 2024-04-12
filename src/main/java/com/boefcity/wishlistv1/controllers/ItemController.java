@@ -39,6 +39,21 @@ public class ItemController {
         model.addAttribute("user", new User());
         return "registerForm"; // Name of the HTML file for the registration form
     }
+    @GetMapping("/addForm")
+    public String displayAddForm(Model model) {
+        model.addAttribute("item", new Item());
+        return "addForm";
+    }
+    @GetMapping("/items")
+    public String displayItems(HttpSession session, Model model) {
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/login";
+        }
+        List<Item> wishlist = itemService.findByUserUserId(userId);
+        model.addAttribute("wishlist", wishlist);
+        return "items";
+    }
 
     @PostMapping("/register")
     public String createUser(@ModelAttribute User user, RedirectAttributes redirectAttributes) {
@@ -67,14 +82,8 @@ public class ItemController {
             session.setAttribute("userId", user.getUserId());
             return "redirect:/items";
         } else {
-            return "loginError"; // Assume you have a login error page at "src/main/resources/templates/loginError.html"
+            return "loginError"; // redirect til samme side, med et redirect flashAtt "no user found"
         }
-    }
-
-    @GetMapping("/addForm")
-    public String displayAddForm(Model model) {
-        model.addAttribute("item", new Item());
-        return "addForm";
     }
 
     @PostMapping("/create")
@@ -90,18 +99,27 @@ public class ItemController {
         return "redirect:/items";
     }
 
-    @GetMapping("/items")
-    public String displayItems(HttpSession session, Model model) {
+    @PostMapping("/delete/{itemId}")
+    public String deleteItem(@PathVariable int itemId, HttpSession session, RedirectAttributes redirectAttributes) {
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null) {
+            redirectAttributes.addFlashAttribute("message", "Please login to delete items.");
             return "redirect:/login";
         }
-        List<Item> wishlist = itemService.findByUserUserId(userId);
-        model.addAttribute("wishlist", wishlist);
-        return "items";
-    }
 
-    // The rest of your methods (delete, update, etc.) should similarly ensure user is logged in and operate on that user's items
+        // Check if the item belongs to the user
+        Item item = itemService.findById(itemId)
+                .orElseThrow(() -> new RuntimeException("Item not found"));
+
+        if (item.getUser().getUserId() != userId) {
+            redirectAttributes.addFlashAttribute("message", "Unauthorized to delete this item");
+            return "redirect:/items";
+        }
+
+        itemService.deleteById(itemId);
+        redirectAttributes.addFlashAttribute("message", "Item deleted successfully!");
+        return "redirect:/items";
+    }
 
     // Utility method for session-based wishlist retrieval, adjusted for direct database fetching
     private List<Item> getWishlist(HttpSession session) {

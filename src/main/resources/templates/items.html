@@ -8,53 +8,57 @@
     <link href="/items.css" rel="stylesheet">
 </head>
 <body class="d-flex flex-column min-vh-100">
-    <header>
-        <nav class="d-flex justify-content-center">
-            <h1>Your Wishlist</h1>
-        </nav>
-    </header>
-    <main>
-        <div th:if="${message}" class="alert alert-dismissible fade show" role="alert">
-            <span th:text="${message}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        <table class="table table-hover">
-            <thead>
-            <tr>
-                <th scope="col"></th>
-                <th scope="col">Name</th>
-                <th scope="col">Description</th>
-                <th scope="col">Link</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="item : ${wishlist}">
-                <th scope="row"></th>
-                <td th:text="${item.name}">TestName1</td>
-                <td th:text="${item.description}">TestDescription1</td>
-                <td th:text="${item.link}">TestLink1</td>
-            </tr>
-            </tbody>
-        </table>
-        <a href="/addForm"><button type="button" class="btn btn-success ms-3">ADD</button></a>
-        <a href="/"><button type="button" class="btn btn-primary ms-3">Exit</button></a>
-
-    </main>
-    <script>
-        // Script to auto-dismiss the alert
-        document.addEventListener("DOMContentLoaded", function() {
-            const alert = document.querySelector('.alert');
-            if (alert) {
-                setTimeout(() => {
-                    const bsAlert = new bootstrap.Alert(alert);
-                    bsAlert.close();
-                }, 5000); // closes the alert after 5000 milliseconds = 5 seconds
-            }
-        });
-    </script>
-    <footer class="mt-auto text-center">
-        <p>BoefCity@EMC.com</p>
-    </footer>
-
+<header>
+    <nav class="d-flex justify-content-center">
+        <h1>Your Wishlist</h1>
+    </nav>
+</header>
+<main>
+    <div th:if="${message}" class="alert alert-dismissible fade show" role="alert">
+        <span th:text="${message}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th scope="col"></th>
+            <th scope="col">Name</th>
+            <th scope="col">Description</th>
+            <th scope="col">Link</th>
+            <th scope="col">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${wishlist}">
+            <th scope="row"></th>
+            <td th:text="${item.name}">TestName1</td>
+            <td th:text="${item.description}">TestDescription1</td>
+            <td th:text="${item.link}">TestLink1</td>
+            <td>
+                <form th:action="@{'/delete/' + ${item.id}}" method="post">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <a href="/addForm"><button type="button" class="btn btn-success ms-3">ADD</button></a>
+    <a href="/"><button type="button" class="btn btn-primary ms-3">Exit</button></a>
+</main>
+<script>
+    // Script to auto-dismiss the alert
+    document.addEventListener("DOMContentLoaded", function() {
+        const alert = document.querySelector('.alert');
+        if (alert) {
+            setTimeout(() => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 5000); // closes the alert after 5000 milliseconds = 5 seconds
+        }
+    });
+</script>
+<footer class="mt-auto text-center">
+    <p>BoefCity@EMC.com</p>
+</footer>
 </body>
 </html>
