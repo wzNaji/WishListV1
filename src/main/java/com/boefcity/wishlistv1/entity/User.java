@@ -25,4 +25,8 @@ public class User {
     // Cascade all operations including delete, and remove orphan items
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Item> items;
+
+    public User(int userId) {
+        this.userId = userId;
+    }
 }
