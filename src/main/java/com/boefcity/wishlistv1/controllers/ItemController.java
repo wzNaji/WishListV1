@@ -165,12 +165,4 @@ public class ItemController {
     }
 
 
-    // Utility method for session-based wishlist retrieval, adjusted for direct database fetching
-    private List<Item> getWishlist(HttpSession session) {
-        Integer userId = (Integer) session.getAttribute("userId");
-        if (userId != null) {
-            return itemService.findByUserUserId(userId);
-        }
-        return List.of(); // Return an empty list if no user is logged in
-    }
 }
