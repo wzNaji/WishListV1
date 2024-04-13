@@ -107,7 +107,8 @@ public class ItemController {
     @PostMapping("/loginUser")
     public String loginUser(@RequestParam String userName,
                             @RequestParam String password,
-                            HttpSession session) {
+                            HttpSession session,
+                            RedirectAttributes redirectAttributes) {
 
         boolean isValidUser = userService.checkLogin(userName, password);
         if (isValidUser) {
@@ -116,7 +117,8 @@ public class ItemController {
             return "redirect:/items";
 
         } else {
-            return "loginError"; // redirect til samme side, med et redirect flashAtt "no user found"
+            redirectAttributes.addFlashAttribute("message", "Incorrect username or password. Try again");
+            return "redirect:/login";
         }
     }
 
