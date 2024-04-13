@@ -47,7 +47,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Item update(int id, Item itemDetails) {
         Item itemToUpdate = itemRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Item not found for this id :: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Item not found for this id: " + id));
 
         itemToUpdate.setName(itemDetails.getName());
         itemToUpdate.setDescription(itemDetails.getDescription());

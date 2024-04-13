@@ -25,7 +25,8 @@
             <th scope="col">Name</th>
             <th scope="col">Description</th>
             <th scope="col">Link</th>
-            <th scope="col">Actions</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
         </tr>
         </thead>
         <tbody>
@@ -34,6 +35,12 @@
             <td th:text="${item.name}">TestName1</td>
             <td th:text="${item.description}">TestDescription1</td>
             <td th:text="${item.link}">TestLink1</td>
+            <td>
+                <a th:href="@{/editItem/{id}(id=${item.id})}">
+                    <button type="button" class="btn btn-warning">Edit</button>
+                </a>
+            </td>
+
             <td>
                 <form th:action="@{'/delete/' + ${item.id}}" method="post">
                     <button type="submit" class="btn btn-danger">Delete</button>

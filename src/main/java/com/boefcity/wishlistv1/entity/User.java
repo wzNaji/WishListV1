@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -21,4 +22,7 @@ public class User {
     @Column(nullable = false)
     private String userPassword;
 
+    // Cascade all operations including delete, and remove orphan items
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Item> items;
 }

@@ -45,18 +45,48 @@ public class ItemController {
         return "addForm";
     }
     @GetMapping("/items")
-    public String displayItems(HttpSession session, Model model) {
+    public String displayItems(HttpSession session,
+                               Model model) {
+
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null) {
             return "redirect:/login";
         }
+
         List<Item> wishlist = itemService.findByUserUserId(userId);
         model.addAttribute("wishlist", wishlist);
         return "items";
     }
+    @GetMapping("/editItem/{id}")
+    public String displayEditForm(@PathVariable int id,
+                                   Model model) {
+
+        Item item = itemService.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid item Id: " + id));
+        model.addAttribute("item", item);
+        return "editForm";
+    }
+
+    @PostMapping("/updateItem/{id}")
+    public String updateItem(@PathVariable int id,
+                             @ModelAttribute Item item,
+                             HttpSession session,
+                             RedirectAttributes redirectAttributes) {
+
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        itemService.update(id, item);
+        redirectAttributes.addFlashAttribute("message", "Item updated successfully!");
+        return "redirect:/items";
+    }
+
 
     @PostMapping("/register")
-    public String createUser(@ModelAttribute User user, RedirectAttributes redirectAttributes) {
+    public String createUser(@ModelAttribute User user,
+                             RedirectAttributes redirectAttributes) {
         try {
             User existingUser = userService.findByUserName(user.getUserName());
             if (existingUser != null) {
@@ -75,23 +105,31 @@ public class ItemController {
 
 
     @PostMapping("/loginUser")
-    public String loginUser(@RequestParam String userName, @RequestParam String password, HttpSession session) {
+    public String loginUser(@RequestParam String userName,
+                            @RequestParam String password,
+                            HttpSession session) {
+
         boolean isValidUser = userService.checkLogin(userName, password);
         if (isValidUser) {
             User user = userService.findByUserName(userName);
             session.setAttribute("userId", user.getUserId());
             return "redirect:/items";
+
         } else {
             return "loginError"; // redirect til samme side, med et redirect flashAtt "no user found"
         }
     }
 
     @PostMapping("/create")
-    public String createItem(@ModelAttribute Item item, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String createItem(@ModelAttribute Item item,
+                             HttpSession session,
+                             RedirectAttributes redirectAttributes) {
+
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null) {
             return "redirect:/login";
         }
+
         User user = userService.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         item.setUser(user);
         itemService.create(item);
@@ -100,7 +138,10 @@ public class ItemController {
     }
 
     @PostMapping("/delete/{itemId}")
-    public String deleteItem(@PathVariable int itemId, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String deleteItem(@PathVariable int itemId,
+                             HttpSession session,
+                             RedirectAttributes redirectAttributes) {
+
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null) {
             redirectAttributes.addFlashAttribute("message", "Please login to delete items.");
