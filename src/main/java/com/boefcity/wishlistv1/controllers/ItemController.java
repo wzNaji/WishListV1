@@ -125,7 +125,7 @@ public class ItemController {
     @PostMapping("/create")
     public String createItem(@ModelAttribute Item item,
                              HttpSession session,
-                             RedirectAttributes redirectAttributes) {
+                            RedirectAttributes redirectAttributes) {
 
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null) {
@@ -135,7 +135,7 @@ public class ItemController {
         User user = userService.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         item.setUser(user);
         itemService.create(item);
-        redirectAttributes.addFlashAttribute("message", "Item added successfully!");
+       redirectAttributes.addFlashAttribute("message", "Item added successfully!");
         return "redirect:/items";
     }
 

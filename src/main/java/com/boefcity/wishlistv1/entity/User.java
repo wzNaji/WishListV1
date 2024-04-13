@@ -26,10 +26,6 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Item> items;
 
-    public User(int userId) {
-        this.userId = userId;
-    }
-
     public User(int userId, String userName) {
         this.userId = userId;
         this.userName = userName;
