@@ -37,7 +37,7 @@ public class ItemController {
     @GetMapping("/register")
     public String displayRegisterForm(Model model) {
         model.addAttribute("user", new User());
-        return "registerForm"; // Name of the HTML file for the registration form
+        return "registerForm";
     }
     @GetMapping("/addForm")
     public String displayAddForm(Model model) {
