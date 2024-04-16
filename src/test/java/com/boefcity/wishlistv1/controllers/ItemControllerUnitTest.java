@@ -91,10 +91,10 @@ public class ItemControllerUnitTest {
     // Delete
     @Test
     public void testDeleteItemWithSessionButUnauthorized() {
-        User user = new User(2, "AnotherUser"); // Assuming the constructor takes userId and userName
+        User user = new User(2, "AnotherUser");
         Item item = new Item();
         item.setUser(user);
-        when(session.getAttribute("userId")).thenReturn(1);
+        when(session.getAttribute("userRole")).thenReturn(1);
         when(itemService.findById(1)).thenReturn(java.util.Optional.of(item));
 
         String result = controller.deleteItem(1, session, redirectAttributes);
