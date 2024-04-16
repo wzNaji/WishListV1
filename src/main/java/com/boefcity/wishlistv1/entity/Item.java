@@ -24,4 +24,19 @@ public class Item {
     @ManyToOne // Etablerer et Many-To-One forhold til User entity
     @JoinColumn(name = "user_id") // Mapper til 'user_id' kolonnen i databasen
     private User user; // Repræsenterer brugeren, der er forbundet med denne vare
+
+    public Item(int id) {
+        this.id = id;
+    }
+    @Override
+    public String toString() {
+        return "Item{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", link='" + link + '\'' +
+                ", userId=" + (user != null ? user.getUserId() : "null") +
+                '}';
+    }
+
 }
