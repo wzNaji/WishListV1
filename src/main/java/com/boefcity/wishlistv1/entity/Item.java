@@ -15,7 +15,7 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment ID/PK
     private int id;
 
-    @Column(nullable = false) // Gør kolonnen non-nullable
+    @Column(nullable = false) // Gør kolonnen not-nullable
     private String name;
 
     private String description;
@@ -23,11 +23,8 @@ public class Item {
 
     @ManyToOne // Etablerer et Many-To-One forhold til User entity
     @JoinColumn(name = "user_id") // Mapper til 'user_id' kolonnen i databasen
-    private User user; // Repræsenterer brugeren, der er forbundet med denne vare
+    private User user; // Repræsenterer brugeren, der er forbundet med denne item
 
-    public Item(int id) {
-        this.id = id;
-    }
     @Override
     public String toString() {
         return "Item{" +

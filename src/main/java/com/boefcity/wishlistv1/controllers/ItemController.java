@@ -24,7 +24,7 @@ public class ItemController {
         this.itemService = itemService;
         this.userService = userService;
     }
-
+//Navationsmetoder
     @GetMapping("/")
     public String displayHomePage() {
         return "homePage";
@@ -44,22 +44,9 @@ public class ItemController {
         model.addAttribute("item", new Item());
         return "addForm";
     }
-    @GetMapping("/items")
-    public String displayItems(HttpSession session,
-                               Model model) {
-
-        Integer userId = (Integer) session.getAttribute("userId");
-        if (userId == null) {
-            return "redirect:/login";
-        }
-
-        List<Item> wishlist = itemService.findByUserUserId(userId);
-        model.addAttribute("wishlist", wishlist);
-        return "items";
-    }
     @GetMapping("/editItem/{id}")
     public String displayEditForm(@PathVariable int id,
-                                   Model model) {
+                                  Model model) {
 
         Item item = itemService.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid item Id: " + id));
@@ -67,24 +54,12 @@ public class ItemController {
         return "editForm";
     }
 
-    @PostMapping("/updateItem/{id}")
-    public String updateItem(@PathVariable int id,
-                             @ModelAttribute Item item,
-                             HttpSession session,
-                             RedirectAttributes redirectAttributes) {
-
-        Integer userId = (Integer) session.getAttribute("userId");
-        if (userId == null) {
-            return "redirect:/login";
-        }
-
-        itemService.update(id, item);
-        redirectAttributes.addFlashAttribute("message", "Item updated successfully!");
-        return "redirect:/items";
-    }
-
+//Oprettelse af User-metoder
 
     @PostMapping("/register")
+    /*ModelAttribute bruges for at skabe et objekt vi kan tilknytte attributer til
+    RedirectAttributes bruges til at vise beskeder til brugeren, baseret på fejlhåndtering
+     */
     public String createUser(@ModelAttribute User user,
                              RedirectAttributes redirectAttributes) {
         try {
@@ -105,11 +80,13 @@ public class ItemController {
 
 
     @PostMapping("/loginUser")
+    //RequestParam bruges til at kræve data fra brugeren - i dette tilfælde brugernavn og kodeord
+    //HttpSession bruges til at give brugeren en personlig udgave af app'en, hvor vi efterfølgende kan hente data fra.
     public String loginUser(@RequestParam String userName,
                             @RequestParam String password,
                             HttpSession session,
                             RedirectAttributes redirectAttributes) {
-
+//Se UserServiceImpl "checkLogin"
         boolean isValidUser = userService.checkLogin(userName, password);
         if (isValidUser) {
             User user = userService.findByUserName(userName);
@@ -122,11 +99,14 @@ public class ItemController {
         }
     }
 
+//CRUD Item metoder
+
     @PostMapping("/create")
     public String createItem(@ModelAttribute Item item,
                              HttpSession session,
                             RedirectAttributes redirectAttributes) {
-
+//Henter brugerID fra session.SetAttribute i login-metoden.
+//Se Login-metoden
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null) {
             return "redirect:/login";
@@ -150,7 +130,7 @@ public class ItemController {
             return "redirect:/login";
         }
 
-        // Check if the item belongs to the user
+        // Kontrollerer om item eksisterer og om den er tilknyttet en user
         Item item = itemService.findById(itemId)
                 .orElseThrow(() -> new RuntimeException("Item not found"));
 
@@ -164,5 +144,33 @@ public class ItemController {
         return "redirect:/items";
     }
 
+    @PostMapping("/updateItem/{id}")
+    public String updateItem(@PathVariable int id,
+                             @ModelAttribute Item item,
+                             HttpSession session,
+                             RedirectAttributes redirectAttributes) {
+
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        itemService.update(id, item);
+        redirectAttributes.addFlashAttribute("message", "Item updated successfully!");
+        return "redirect:/items";
+    }
+    @GetMapping("/items")
+    public String displayItems(HttpSession session,
+                               Model model) {
+
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        List<Item> wishlist = itemService.findByUserUserId(userId);
+        model.addAttribute("wishlist", wishlist);
+        return "items";
+    }
 
 }

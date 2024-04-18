@@ -25,7 +25,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User saveUser(User user) {
-        // Before saving, ensure the username is unique to maintain data integrity
         if(userRepository.findByUserName(user.getUserName()) != null) {
             throw new RuntimeException("Username already exists.");
         }
@@ -36,7 +35,7 @@ public class UserServiceImpl implements UserService {
     public boolean checkLogin(String userName, String password) {
         User user = userRepository.findByUserName(userName);
         if(user != null) {
-            // This is a simplistic check; real applications should use hashed passwords
+            //Dette tjek returnerer brugerens password - for at opretholde korrekt sikkerhedsstandard, burde tjekket returnere en hashcode.
             return user.getUserPassword().equals(password);
         }
         return false;

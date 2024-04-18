@@ -19,15 +19,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@Transactional
+@SpringBootTest // Indikerer, at denne klasse skal behandles som en Spring Boot-test
+@AutoConfigureMockMvc // Aktiverer automatisk konfiguration af MockMvc
+@Transactional //Tilføjer annotation til alle metoder - se UserServiceImpl
 public class ItemControllerIT {
 
     @Autowired
-    private MockMvc mockMvc;
+    private MockMvc mockMvc; // Mock-objekt til at udføre HTTP-anmodninger
 
-    private MockHttpSession session;
+    private MockHttpSession session; // Session-objekt til at simulere en brugers session
 
     private Item item; // For at bruge 'item' i 'int itemId = item.getId();' testDeleteItemWithSession
 
@@ -42,7 +42,7 @@ public class ItemControllerIT {
 
     @BeforeEach
     void setUp() {
-        session = new MockHttpSession();
+        session = new MockHttpSession(); //Instansierer ny session
 
 
         User user = new User();
@@ -54,29 +54,22 @@ public class ItemControllerIT {
         item.setName("itemName");
         item.setDescription("testDescription");
         item.setLink("testLink");
-        item.setUser(user); // Linking user to the item
+        item.setUser(user);
 
-        user.getItems().add(item); // Adding the item to the user's list
+        user.getItems().add(item);
 
-        userRepository.save(user); // Save the user which cascades to save the item
+        userRepository.save(user); // Gemmer kun brugeren, da vi bruger cascadeType.ALL
 
 
-        session.setAttribute("userId", user.getUserId()); // Storing user ID in session for the test
+        session.setAttribute("userId", user.getUserId());
     }
     @AfterEach
     void tearDown() {
-        // Clear all attributes from the session to avoid side effects between tests
+        // Ryd alle attributter fra sessionen for at have samme forudsætninger for hver test.
         session.clearAttributes();
 
-
-        // Clear repository data
         itemRepository.deleteAll();
         userRepository.deleteAll();
-
-        // Explicitly flush the changes to ensure data is wiped before the next test
-        itemRepository.flush();
-        userRepository.flush();
-
     }
 
 
@@ -150,7 +143,7 @@ public class ItemControllerIT {
     @Test
     public void testCreateUserWithExistingUsername() throws Exception {
         User user = new User();
-        user.setUserName("testUser");
+        user.setUserName("testUser"); //Setter navnet på den nye bruger til samme brugernavn som i vores BeforeEach
         user.setUserPassword("testPass");
         mockMvc.perform(post("/register")
                         .flashAttr("user", user))
