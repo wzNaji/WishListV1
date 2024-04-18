@@ -23,6 +23,19 @@ public class ItemServiceImpl implements ItemService {
     public void create(Item item) {
         itemRepository.save(item);
     }
+    //Transactional bruges til at lave ændringer, ellers foretages et rollback
+    @Transactional
+    @Override
+    public Item update(int id, Item itemDetails) {
+        Item itemToUpdate = itemRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Item not found for this id: " + id));
+
+        itemToUpdate.setName(itemDetails.getName());
+        itemToUpdate.setDescription(itemDetails.getDescription());
+        itemToUpdate.setLink(itemDetails.getLink());
+
+        return itemRepository.save(itemToUpdate);
+    }
 
     @Transactional(readOnly = true) // Når vi kun skal læse fra databasen. Optimerer resource usage og perfomance.
     @Override
@@ -36,24 +49,10 @@ public class ItemServiceImpl implements ItemService {
         itemRepository.deleteById(id);
     }
 
-    @Transactional(readOnly = true) // Når vi kun skal læse fra databasen. Optimerer resource usage og perfomance.
+    @Transactional(readOnly = true)
     @Override
     public List<Item> findAll() {
         return itemRepository.findAll();
-    }
-
-
-    @Transactional
-    @Override
-    public Item update(int id, Item itemDetails) {
-        Item itemToUpdate = itemRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Item not found for this id: " + id));
-
-        itemToUpdate.setName(itemDetails.getName());
-        itemToUpdate.setDescription(itemDetails.getDescription());
-        itemToUpdate.setLink(itemDetails.getLink());
-
-        return itemRepository.save(itemToUpdate);
     }
     @Override
     public List<Item> findByUserUserId(int userId) {

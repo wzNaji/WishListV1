@@ -8,6 +8,7 @@ import java.util.Optional;
 
 
 public interface ItemService {
+    //ItemService bruges til seperation of concern og loose coupling osv.
     void create (Item item);
     Optional<Item> findById (int id);
 

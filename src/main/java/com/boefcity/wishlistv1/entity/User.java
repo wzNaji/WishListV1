@@ -19,7 +19,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Genererer automatisk et unikt id for hver bruger
     private int userId;
 
-    // userName kan ikke være null
+    // userName kan ikke være null og skal være unik
     @Column(nullable = false, unique = true)
     private String userName;
 

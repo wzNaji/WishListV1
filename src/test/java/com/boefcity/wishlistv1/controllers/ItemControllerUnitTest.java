@@ -17,7 +17,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
+// Aktiverer Mockito-frameworket til at gøre brug af mocks og stubs muligt i testklassen
 @ExtendWith(MockitoExtension.class)
 public class ItemControllerUnitTest {
 
@@ -32,7 +32,7 @@ public class ItemControllerUnitTest {
     @Mock
     private HttpSession session;
 
-    @InjectMocks
+    @InjectMocks //Injekter nødvendige klasser - se ItemController Constructor
     private ItemController controller;
 
 
@@ -56,7 +56,6 @@ public class ItemControllerUnitTest {
         verify(model).addAttribute(eq("user"), any(User.class));
     }
 
-    // Create
     @Test
     public void testCreateUserAlreadyExists() {
         User user = new User();
@@ -88,8 +87,6 @@ public class ItemControllerUnitTest {
         verify(redirectAttributes).addFlashAttribute("message", "Please login to delete items.");
     }
 
-    // Delete
-
     @Test
     public void testDeleteItemAuthorized() {
         User user = new User(1, "CurrentUser");
@@ -97,14 +94,13 @@ public class ItemControllerUnitTest {
         item.setUser(user);
         when(session.getAttribute("userId")).thenReturn(1);
         when(itemService.findById(1)).thenReturn(java.util.Optional.of(item));
-        doNothing().when(itemService).deleteById(1);
+        doNothing().when(itemService).deleteById(1);  //Bruges for at undgå at opjektet faktisk slettes i databasen
 
         String result = controller.deleteItem(1, session, redirectAttributes);
         assertEquals("redirect:/items", result);
         verify(redirectAttributes).addFlashAttribute("message", "Item deleted successfully!");
     }
 
-    // Update
     @Test
     public void testUpdateItemNotLoggedIn() {
         when(session.getAttribute("userId")).thenReturn(null);
